@@ -16,12 +16,12 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "rg" {
-  name     = "myTFResourceGroup"
-  location = "East US"
+  name     = "${var.project-name}-rg"
+  location = var.location
 }
 
 resource "azurerm_storage_account" "storage" {
-  name                     = "qurtstorageaccount2024"
+  name                     = "${var.project-name}sa"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
@@ -29,14 +29,14 @@ resource "azurerm_storage_account" "storage" {
 }
 
 resource "azurerm_storage_container" "container" {
-  name                  = "mycontainer"
+  name                  = "${var.project-name}container"
   storage_account_name  = azurerm_storage_account.storage.name
   container_access_type = "blob"
   depends_on = [ azurerm_storage_account.storage ]
 }
 
 resource "azurerm_storage_blob" "blob" {
-  name                   = "sample.txt"
+  name                   = "${var.project-name}blob"
   storage_account_name   = azurerm_storage_account.storage.name
   storage_container_name = azurerm_storage_container.container.name
   type                   = "Block"
