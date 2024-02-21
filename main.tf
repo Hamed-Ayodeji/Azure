@@ -41,7 +41,7 @@ resource "azurerm_storage_blob" "blob" {
   storage_account_name            = azurerm_storage_account.storage.name
   storage_container_name          = azurerm_storage_container.container.name
   type                            = "Block"
-  source                          = "sample.txt"
+  source                          = "custom-script-ext.sh"
   depends_on                      = [ azurerm_storage_container.container ]
 }
 
@@ -107,6 +107,22 @@ resource "azurerm_linux_virtual_machine" "vm" {
   depends_on                      = [ azurerm_network_interface.nic, azurerm_availability_set.availability-set ]
 }
 
+resource "azurerm_virtual_machine_extension" "vmext" {
+  name                            = "${var.project-name}-vmext"
+  virtual_machine_id              = azurerm_linux_virtual_machine.vm.id
+  publisher                       = "Microsoft.Azure.Extensions"
+  type                            = "CustomScript"
+  type_handler_version            = "2.0"
+  settings = <<SETTINGS
+    {
+        "fileUris": ["https://${azurerm_storage_account.storage.name}.blob.core.windows.net/${azurerm_storage_container.container.name}/${azurerm_storage_blob.blob.name}"],
+        "commandToExecute": "bash custom-script-ext.sh"
+    }
+  
+  SETTINGS
+  depends_on                      = [ azurerm_linux_virtual_machine.vm, azurerm_storage_blob.blob ]
+}
+
 resource "azurerm_public_ip" "publicip" {
   name                            = "${var.project-name}-publicip"
   location                        = azurerm_resource_group.rg.location
@@ -135,6 +151,6 @@ resource "azurerm_availability_set" "availability-set" {
   name                            = "${var.project-name}-availability-set"
   location                        = azurerm_resource_group.rg.location
   resource_group_name             = azurerm_resource_group.rg.name
-  platform_fault_domain_count     = 2
-  platform_update_domain_count    = 2
+  platform_fault_domain_count     = 3
+  platform_update_domain_count    = 3
 }
