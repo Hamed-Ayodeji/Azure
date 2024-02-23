@@ -4,4 +4,6 @@ variable "client_secret" {}
 variable "tenant_id" {}
 variable "project-name" {}
 variable "location" {}
+variable "countNumber" {}
 variable "vnet_address_space" {}
+variable "win_password" {}
