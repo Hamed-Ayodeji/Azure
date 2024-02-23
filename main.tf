@@ -41,6 +41,7 @@ resource "local_file" "linux-key" {
   content                         = tls_private_key.rsakey.private_key_pem
   filename                        = "${var.project-name}key.pem"
 }
+
 resource "azurerm_resource_group" "rg" {
   name                            = "${var.project-name}-rg"
   location                        = var.location
@@ -177,7 +178,6 @@ resource "azurerm_windows_virtual_machine" "windows-vm" {
 #         "fileUris": ["https://${azurerm_storage_account.storage.name}.blob.core.windows.net/${azurerm_storage_container.container.name}/${azurerm_storage_blob.blob.name}"],
 #         "commandToExecute": "bash ${azurerm_storage_blob.blob.name}"
 #     }
-  
 #   SETTINGS
 #   depends_on                      = [ azurerm_linux_virtual_machine.vm, azurerm_storage_blob.blob ]
 # }
